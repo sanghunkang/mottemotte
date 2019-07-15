@@ -1,0 +1,8 @@
+.BarChart {
+    width: 100%;
+    height: 80vh;
+    max-width: 100rem;
+    overflow : auto;
+
+    background: #DDDDDD;
+}

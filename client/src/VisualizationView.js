@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import './VisualizationView.css'
 
@@ -162,12 +162,50 @@ function drawChart() {
 
 // Functional React Components
 function VisualizationView() {
-  useEffect(() => drawChart()); 
+  const [count, setCount] = useState(0);
+
+  function handleClick() {
+    setCount(count+1);
+  }
+
+  useEffect(() => {
+    drawChart();
+    // fetch('/api/getData')
+    // let data = {
+    //   context: this.state.context,
+    //   input: { text: message || '' }
+    // };
+
+    // fetch('/api/getData', {
+    //   method: 'GET',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     // 'Content-Type': 'application/x-www-form-urlencoded',
+    //   },
+    //   // body: JSON.stringify(data)
+    // })
+    //   .then(res => {
+    //     console.log(res);
+    //     return res.json();
+    //   })
+    //   .then(res => {
+    //     console.log(res);
+    //   })
+    //   .catch(err => console.log(err));
+  }); 
+
   
   return(
     <div className="VisualizationView">
-      Vis View
-      <svg className="BarChart" />
+      <div
+        onClick={handleClick}>
+        Vis View {count}
+      </div>
+      <svg
+        className="BarChart"
+        onClick={handleClick}
+        onMouseMove={handleClick}>
+      </svg>
     </div>
   );
 }

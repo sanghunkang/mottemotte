@@ -44,7 +44,8 @@ var onMouseLeaveItem = function(){
 // d3 rendering functions
 // Closure contexts with dependencies on browsers
 let h = 500;
-
+let xCoeff = 50;
+let yCoeff = 3;
 
 var drawItemBoxes = function() {
   return function(svg, data, zoom=10) {
@@ -57,9 +58,9 @@ var drawItemBoxes = function() {
       .append("rect")
       .attr("class", "Box")
       .attr("x", (d, i) => i * 70*zoom/10)
-      .attr("y", (d, i) => h - d*10*zoom/10)
-      .attr("width", 65*zoom/10)
-      .attr("height", (d, i) => d*10*zoom/10)
+      .attr("y", (d, i) => h - d*yCoeff*zoom/10)
+      .attr("width", xCoeff*zoom/10)
+      .attr("height", (d, i) => d*yCoeff*zoom/10)
       .attr('fill', "green")
       .on('click', onClickItem)
       .on('mouseenter', onMouseEnterItem)
@@ -84,8 +85,7 @@ var addDateIndeces = function() {
 }();
 
 
-let data = [12, 5, 6, 6, 9, 10, 2, 3, 6, 3, 3, 3, 6, 3, 4, 3, 2, 12, 11, 32, 12, 32, 15];
-
+//  = [12, 5, 6, 6, 9, 10, 2, 3, 6, 3, 3, 3, 6, 3, 4, 3, 2, 12, 11, 32, 12, 32, 15];
 let indexStart = 0;
 let range = 14;
 let stride = 15;
@@ -135,6 +135,7 @@ var handleVerticalScroll = function() {
 }();
 
 var updateBarChart = function(svg, zoom) {
+  
   if (zoom < 10) {
     range = Math.min(parseInt(range/zoom*10), 50);
   } else if (10 <= zoom) {
@@ -147,7 +148,8 @@ var updateBarChart = function(svg, zoom) {
 }
 
 
-function drawChart() {
+function drawChart(data) {
+  
   var svg = d3.select(".BarChart");
   updateBarChart(svg, zoom);        
   
@@ -157,8 +159,48 @@ function drawChart() {
 
 }
 
+function fetchData() {
+  let data = [];
+  fetch('/api/getData', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    // body: JSON.stringify(data)
+  })
+    .then(res => res.json())
+    .then(res => {
+      data = processData(res);
+    })
+    .catch(err => console.log(err));
+  console.log(data);
+  return data;
+}
 
+let data = [];
+  fetch('/api/getData', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      // 'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    // body: JSON.stringify(data)
+  })
+    .then(res => res.json())
+    .then(res => {
+      data = processData(res);
+    })
+    .catch(err => console.log(err));
 
+function processData(data) {
+  return data.map((row)=> {
+    let plannedStartTime = new Date(row.planned_start_time);
+    let plannedEndTime = new Date(row.planned_end_time);
+    return (plannedEndTime.getTime() - plannedStartTime.getTime())/60000;
+  });
+  // return data[0];
+}
 
 // Functional React Components
 function VisualizationView() {
@@ -170,28 +212,6 @@ function VisualizationView() {
 
   useEffect(() => {
     drawChart();
-    // fetch('/api/getData')
-    // let data = {
-    //   context: this.state.context,
-    //   input: { text: message || '' }
-    // };
-
-    // fetch('/api/getData', {
-    //   method: 'GET',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     // 'Content-Type': 'application/x-www-form-urlencoded',
-    //   },
-    //   // body: JSON.stringify(data)
-    // })
-    //   .then(res => {
-    //     console.log(res);
-    //     return res.json();
-    //   })
-    //   .then(res => {
-    //     console.log(res);
-    //   })
-    //   .catch(err => console.log(err));
   }); 
 
   
@@ -201,12 +221,21 @@ function VisualizationView() {
         onClick={handleClick}>
         Vis View {count}
       </div>
-      <svg
-        className="BarChart"
-        onClick={handleClick}
-        onMouseMove={handleClick}>
-      </svg>
+      <BarChart />
     </div>
+  );
+}
+
+function BarChart() {
+  useEffect(() => {
+    drawChart(fetchData());
+    
+  });
+
+  return(
+    <svg
+      className="BarChart">
+    </svg>
   );
 }
 

@@ -1,15 +1,16 @@
 import React from 'react';
 import './App.css';
 
+import { Grid } from 'semantic-ui-react'
 import MenuBar from './MenuBar';
 import VisualizationView from './VisualizationView';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-          Mottemotte
-      </header>
+      <div className="App-header" >
+        Mottemotte
+      </div>
       <MenuBar />
       <VisualizationView />
     </div>

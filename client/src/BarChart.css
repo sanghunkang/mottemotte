@@ -1,6 +1,6 @@
 .BarChart {
     width: 100%;
-    height: 80vh;
+    height: 80%;
     max-width: 100rem;
     overflow : auto;
 
@@ -14,3 +14,4 @@
 .clicked {
     background: 'magenta';
 }
+

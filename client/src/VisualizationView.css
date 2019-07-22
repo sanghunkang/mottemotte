@@ -1,0 +1,10 @@
+.ItemAdder {
+    width: 100%;
+    height: 15%;
+    /* display: inline; */
+    margin: 0 !important;
+}
+
+.ItemAdderRow {
+    padding: 0 !important;
+}

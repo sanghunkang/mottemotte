@@ -10,7 +10,7 @@ function processData(data) {
   let previousDuration = 0;
   let previousDate = new Date(data[0].planned_start_time).getDate();
   
-  let processedData = data.map((row)=> {
+  let processedData = data.map((row, i)=> {
     let plannedStartTime = new Date(row.planned_start_time);
     let plannedEndTime = new Date(row.planned_end_time);
     
@@ -26,19 +26,22 @@ function processData(data) {
     previousDuration = (plannedEndTime.getTime() - plannedStartTime.getTime())/60000;
 
     return {
+      boxID: i,
+      plannedStartTime: plannedStartTime,
+      plannedEndTime: plannedEndTime,
       dailyStartTime: dailyStartTime,
       duration: previousDuration,
       dateIndex: dateIndex 
     };
   });
-  
+
   return processedData;
 }
 
 let stride = 15;
 
 // Functional Components
-function BarChart() {
+function BarChart(props) {
   const [data, setData] = useState([]);
   const [zoom, setZoom] = useState(1);
   const [sumDeltaX, setSumDeltaX] = useState(0);
@@ -86,10 +89,20 @@ function BarChart() {
     }
   }
 
+  function handleClick(e) {
+    if (e.target.getAttribute('class') === 'Box clicked') {
+      let boxID = e.target.getAttribute("id");
+      // e.target.setAttribute("x", "100");
+      props.handleClickBox(data[boxID]);
+    }
+
+  }
+
   return(
     <svg
+      className="BarChart"
       onWheel={handleWheel}
-      className="BarChart">
+      onClick={handleClick}>
     </svg>
   );
 }
@@ -115,8 +128,8 @@ let indexStart = 0;
 let range = 14;
 
 let h = 500;
-let xCoeff = 50;
-let yCoeff = 3;
+let xCoeff = 100;
+let yCoeff = 5;
 
 function updateBoxes(svg, data, zoom=10) {
   svg.selectAll(".Box")
@@ -126,8 +139,9 @@ function updateBoxes(svg, data, zoom=10) {
     .data(data)
     .enter()
     .append("rect")
+    .attr("id", (d, i)=> d.boxID)
     .attr("class", "Box")
-    .attr("x", (d, i) => d.dateIndex * 70*zoom/10)
+    .attr("x", (d, i) => d.dateIndex * xCoeff*1.2*zoom/10)
     .attr("y", (d, i) => h - (d.duration+d.dailyStartTime) *yCoeff*zoom/10)
     .attr("width", xCoeff*zoom/10)
     .attr("height", (d, i) => (d.duration*yCoeff*zoom/10))
@@ -135,6 +149,21 @@ function updateBoxes(svg, data, zoom=10) {
     .on('click', onClickItem)
     .on('mouseenter', onMouseEnterItem)
     .on('mouseleave', onMouseLeaveItem);
+};
+
+function updateDateIndeces(svg, data, indexStart, zoom) {  
+  svg.selectAll(".DateIndex")
+    .remove();
+
+  svg.selectAll(".DateIndex")
+    .data(data)
+    .enter()
+    .append("text")
+    .attr("class", 'DateIndex')
+    .style("font", "5px times")
+    .text((d) => (d + indexStart + 1) + languagePack.day)
+    .attr("x", (d, i) => i * 70*zoom/10)
+    .attr("y", (d, i) => h)
 };
 
 const HIGHLIGHT_ON = 'yellow';
@@ -176,20 +205,6 @@ var onMouseLeaveItem = function(){
 }();
 
 
-var updateDateIndeces = function() {
-  return function(svg, data, indexStart, zoom) {  
-    svg.selectAll(".DateIndex")
-      .remove();
 
-    svg.selectAll(".DateIndex")
-      .data(data)
-      .enter()
-      .append("text")
-      .attr("class", 'DateIndex')
-      .text((d) => (d + indexStart + 1) + languagePack.day)
-      .attr("x", (d, i) => i * 70*zoom/10)
-      .attr("y", (d, i) => h)
-  }
-}();
 
 export default BarChart;

@@ -5,6 +5,12 @@
     margin: 0 !important;
 }
 
+.ItemAdderHeader {
+    /* height: 5%;s */
+    padding: 0 !important;
+}
+
 .ItemAdderRow {
+    /* height: 5%; */
     padding: 0 !important;
 }

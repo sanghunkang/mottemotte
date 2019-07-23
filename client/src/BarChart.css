@@ -1,7 +1,40 @@
 .BarChart {
     width: 100%;
-    height: 80%;
     max-width: 100rem;
+    height: 80%;
+    /* overflow : auto; */
+}
+
+
+
+.VerticalScale {
+    width: 5%;
+    height: 95%;
+    overflow : auto;
+
+    background: #BBBBBB;
+}
+
+.HorizontalScale {
+    width: 95%;
+    height: 5%;
+    overflow : auto;
+
+    background: #888888;
+}
+
+.Corner {
+    width: 5%;
+    height: 5%;
+    overflow : auto;
+
+    background: #444444;
+}
+
+.Chart {
+    width: 95%;
+    /* max-width: 90rem; */
+    height: 95%;
     overflow : auto;
 
     background: #DDDDDD;

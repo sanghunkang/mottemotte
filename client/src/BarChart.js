@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import './BarChart.css'
 
@@ -11,19 +11,26 @@ function processData(data) {
   let previousDate = new Date(data[0].planned_start_time).getDate();
   
   let processedData = data.map((row, i)=> {
+    // console.log(row);
     let plannedStartTime = new Date(row.planned_start_time);
     let plannedEndTime = new Date(row.planned_end_time);
     
     // Check if we have to stack or proceed to next date
-    console.log(previousDate, plannedStartTime.getDate());
+    // console.log(previousDate, plannedStartTime.getDate());
     if (previousDate === plannedStartTime.getDate()) {
       dailyStartTime += previousDuration;
     } else {
-      dateIndex += 1;
+      dateIndex += plannedStartTime.getDate() - previousDate;
       dailyStartTime = 0;
     }
     previousDate = plannedStartTime.getDate()
     previousDuration = (plannedEndTime.getTime() - plannedStartTime.getTime())/60000;
+
+    // .attr("x", (d, i) => d.dateIndex * xCoeff*1.2*zoom/10)
+    // .attr("y", (d, i) => h - (d.duration+d.dailyStartTime) *yCoeff*zoom/10)
+    // .attr("width", xCoeff*zoom/10)
+    // .attr("height", (d, i) => (d.duration*yCoeff*zoom/10))
+
 
     return {
       boxID: i,
@@ -31,7 +38,10 @@ function processData(data) {
       plannedEndTime: plannedEndTime,
       dailyStartTime: dailyStartTime,
       duration: previousDuration,
-      dateIndex: dateIndex 
+      dateIndex: dateIndex,
+      category1: row.category_1,
+      category2: row.category_2,
+      category3: row.category_3
     };
   });
 
@@ -41,12 +51,51 @@ function processData(data) {
 let stride = 15;
 
 // Functional Components
+function VerticalScale(props) {
+  return(
+    <svg
+      className="VerticalScale">
+      VerticalScale
+    </svg>
+  )
+}
+
+function HorizontalScale(props) {
+  return(
+    <svg
+      className="HorizontalScale">
+      VerticalScale
+    </svg>
+  )
+}
+
+function Corner(props) {
+  return(
+    <div>
+      Random Place
+    </div>
+  )
+}
+
 function BarChart(props) {
+  const ref = useRef(null);
+  
+  const [width, setWidth] = useState(0);
+  const [height, setHeight] = useState(0);
   const [data, setData] = useState([]);
   const [zoom, setZoom] = useState(1);
   const [sumDeltaX, setSumDeltaX] = useState(0);
   const [sumDeltaY, setSumDeltaY] = useState(0);
   const [willChangeDataRange, setWillChangeDataRange] = useState(false);
+
+
+  useEffect(() => {
+    setWidth(ref.current.clientWidth);
+    setHeight(ref.current.clientHeight);
+    console.log(width, height);
+  }, [width, height]);
+
+ 
 
   useEffect(() => {    
     let apiParams = {
@@ -64,8 +113,9 @@ function BarChart(props) {
     updateBarChart(data, zoom);
   }, [data, zoom]);
 
-  
+  let indexStart = 0;
   function handleWheel(e) {
+    
     // Horizontal scroll
     if (sumDeltaX < -stride || stride < sumDeltaX ) {
       indexStart += sumDeltaX < 0? -1: 1;
@@ -79,9 +129,9 @@ function BarChart(props) {
     // Vertical scroll
     if (sumDeltaY < -200 || 200 < sumDeltaY ) {
       if (1 < zoom && sumDeltaY < 0) { // Lower bound
-        setZoom(Math.abs(zoom - 1));
+        setZoom(Math.abs(zoom*0.9));
       } else if (zoom < 10 && 0 < sumDeltaY ) { // Upper bound
-        setZoom(Math.abs(zoom + 1));
+        setZoom(Math.abs(zoom*1.1));
       }
       setSumDeltaY(0);
     } else {
@@ -99,37 +149,46 @@ function BarChart(props) {
   }
 
   return(
-    <svg
-      className="BarChart"
-      onWheel={handleWheel}
-      onClick={handleClick}>
-    </svg>
+    <div className="BarChart">
+      {/* <div> */}
+        <VerticalScale
+          height={height}/>
+        <svg
+          ref={ref}
+          className="Chart"
+          onWheel={handleWheel}
+          onClick={handleClick}>
+        </svg>
+      {/* </div> */}
+      {/* <div> */}
+        <Corner />
+        <HorizontalScale 
+          width={width}/>
+      {/* </div> */}
+    </div>
   );
 }
 
 
 
+
+let range = 14;
+let h = 400;
+let xCoeff = 100;
+let yCoeff = 5;
+
 // d3 functions
 function updateBarChart(data, zoom) {
-  const svg = d3.select(".BarChart");
+  const svg = d3.select(".Chart");
   if (zoom < 10) {
     range = Math.min(parseInt(range/zoom*10), 50);
   } else if (10 <= zoom) {
     range = Math.max(parseInt(range/zoom*10), 14);
   }
 
-  // updateBoxes(svg, data.slice(indexStart,indexStart+range), zoom);
-  // updateDateIndeces(svg, [...Array(range).keys()], indexStart, zoom);
   updateBoxes(svg, data, zoom);
-  updateDateIndeces(svg, [...Array(data.length).keys()], indexStart, zoom);
+  updateDateIndeces(svg, [...Array(data.length).keys()], zoom);
 }
-
-let indexStart = 0;
-let range = 14;
-
-let h = 500;
-let xCoeff = 100;
-let yCoeff = 5;
 
 function updateBoxes(svg, data, zoom=10) {
   svg.selectAll(".Box")
@@ -151,7 +210,7 @@ function updateBoxes(svg, data, zoom=10) {
     .on('mouseleave', onMouseLeaveItem);
 };
 
-function updateDateIndeces(svg, data, indexStart, zoom) {  
+function updateDateIndeces(svg, data, zoom) {  
   svg.selectAll(".DateIndex")
     .remove();
 
@@ -161,9 +220,9 @@ function updateDateIndeces(svg, data, indexStart, zoom) {
     .append("text")
     .attr("class", 'DateIndex')
     .style("font", "5px times")
-    .text((d) => (d + indexStart + 1) + languagePack.day)
+    .text((d) => (d + 1) + languagePack.day)
     .attr("x", (d, i) => i * 70*zoom/10)
-    .attr("y", (d, i) => h)
+    .attr("y", (d, i) => h-30)
 };
 
 const HIGHLIGHT_ON = 'yellow';

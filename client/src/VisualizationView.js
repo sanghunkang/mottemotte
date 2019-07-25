@@ -13,6 +13,8 @@ function getYear() {
 function VisualizationView() {
   const [plannedStartTime, setPlannedStartTime] = useState(new Date());
   const [plannedEndTime, setPlannedEndTime] = useState(new Date());
+  const [actualStartTime, setActualStartTime] = useState(new Date());
+
 
   const [duration, setDuration] = useState(30)
   const [category1, setCategory1] = useState('');
@@ -24,6 +26,7 @@ function VisualizationView() {
     console.log('prop triggered by higher order component', e);
     setPlannedStartTime(e.plannedStartTime);
     setPlannedEndTime(e.plannedEndTime);
+    setActualStartTime(e.actualStartTime);
     setDuration(e.duration);
     setCategory1(e.category1);
     setCategory2(e.category2);
@@ -36,6 +39,7 @@ function VisualizationView() {
       <ItemAdder
         plannedStartTime={plannedStartTime}
         plannedEndTime={plannedEndTime}
+        actualStartTime={actualStartTime}
         duation={duration}
         category1={category1}
         category2={category2}
@@ -128,7 +132,7 @@ function ItemAdder(props) {
             type="text"
             fluid="true"
             size="mini"
-            value={props.plannedStartTime.toLocaleDateString()}>
+            value={props.actualStartTime.toLocaleDateString()}>
           </Input>
         </Grid.Column>
         <Grid.Column width={2}>
@@ -136,7 +140,7 @@ function ItemAdder(props) {
             type="text"
             fluid="true"
             size="mini"
-            value={props.plannedStartTime.toLocaleTimeString()}>
+            value={props.actualStartTime.toLocaleTimeString()}>
           </Input>
         </Grid.Column>
         <Grid.Column width={2}>

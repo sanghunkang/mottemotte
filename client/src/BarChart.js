@@ -4,46 +4,51 @@ import React, { useEffect, useState, useRef } from 'react';
 import './BarChart.css'
 
 // Parsers/formatters
-function processData(data) {
-  let dateIndex = 0;
-  let dailyStartTime = 0;
-  let previousDuration = 0;
+function processData(data, height, width) {
+  console.log(data);
+  let xStacked = 0;
+  let yStacked = 0;
+  let previousHeightBox = 0;
   let previousDate = new Date(data[0].planned_start_time).getDate();
   
   let processedData = data.map((row, i)=> {
     // console.log(row);
     let plannedStartTime = new Date(row.planned_start_time);
     let plannedEndTime = new Date(row.planned_end_time);
-    
+    let actualStartTime = new Date(row.actual_start_time);
+
     // Check if we have to stack or proceed to next date
-    // console.log(previousDate, plannedStartTime.getDate());
+    let heightBox = height*(plannedEndTime.getTime() - plannedStartTime.getTime())/(60000*24*60);
     if (previousDate === plannedStartTime.getDate()) {
-      dailyStartTime += previousDuration;
+      yStacked += previousHeightBox;
     } else {
-      dateIndex += plannedStartTime.getDate() - previousDate;
-      dailyStartTime = 0;
+      xStacked += 1;//plannedStartTime.getDate() - previousDate;
+      yStacked = 0;
     }
     previousDate = plannedStartTime.getDate()
-    previousDuration = (plannedEndTime.getTime() - plannedStartTime.getTime())/60000;
 
-    // .attr("x", (d, i) => d.dateIndex * xCoeff*1.2*zoom/10)
-    // .attr("y", (d, i) => h - (d.duration+d.dailyStartTime) *yCoeff*zoom/10)
-    // .attr("width", xCoeff*zoom/10)
-    // .attr("height", (d, i) => (d.duration*yCoeff*zoom/10))
-
+    previousHeightBox = heightBox;
 
     return {
+      // Graph attributes
+      x: xStacked,
+      y: yStacked,
+      height: heightBox,
+      
       boxID: i,
       plannedStartTime: plannedStartTime,
       plannedEndTime: plannedEndTime,
-      dailyStartTime: dailyStartTime,
-      duration: previousDuration,
-      dateIndex: dateIndex,
+      duration: (plannedEndTime.getTime() - plannedStartTime.getTime())/60000,
+      
+      actualStartTime: actualStartTime,
+
       category1: row.category_1,
       category2: row.category_2,
-      category3: row.category_3
+      category3: row.category_3,
+      
     };
   });
+  console.log(processedData);
 
   return processedData;
 }
@@ -92,11 +97,8 @@ function BarChart(props) {
   useEffect(() => {
     setWidth(ref.current.clientWidth);
     setHeight(ref.current.clientHeight);
-    console.log(width, height);
-  }, [width, height]);
-
- 
-
+  }, [width, height]); 
+  
   useEffect(() => {    
     let apiParams = {
       method: 'GET',
@@ -104,10 +106,9 @@ function BarChart(props) {
     };
     fetch('/api/getData', apiParams)
       .then((res)=> res.json())
-      .then((res)=> setData(processData(res)))
+      .then((res)=> setData(processData(res, height, width)))
       .catch((err)=> console.log(err));
-    
-  }, [willChangeDataRange]);
+  }, [willChangeDataRange, width, height]);
 
   useEffect(()=> {
     updateBarChart(data, zoom);
@@ -175,7 +176,6 @@ function BarChart(props) {
 let range = 14;
 let h = 400;
 let xCoeff = 100;
-let yCoeff = 5;
 
 // d3 functions
 function updateBarChart(data, zoom) {
@@ -200,10 +200,10 @@ function updateBoxes(svg, data, zoom=10) {
     .append("rect")
     .attr("id", (d, i)=> d.boxID)
     .attr("class", "Box")
-    .attr("x", (d, i) => d.dateIndex * xCoeff*1.2*zoom/10)
-    .attr("y", (d, i) => h - (d.duration+d.dailyStartTime) *yCoeff*zoom/10)
+    .attr("x", (d, i) => d.x * xCoeff*1.2*zoom/10)
+    .attr("y", (d, i) => d.y) //h - (d.duration+d.dailyStartTime) *yCoeff*zoom/10)
     .attr("width", xCoeff*zoom/10)
-    .attr("height", (d, i) => (d.duration*yCoeff*zoom/10))
+    .attr("height", (d, i) => d.height)//(d.duration*yCoeff*zoom/10))
     .attr('fill', "green")
     .on('click', onClickItem)
     .on('mouseenter', onMouseEnterItem)

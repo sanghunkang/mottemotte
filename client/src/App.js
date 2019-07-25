@@ -1,7 +1,6 @@
 import React from 'react';
 import './App.css';
 
-import { Grid } from 'semantic-ui-react'
 import MenuBar from './MenuBar';
 import VisualizationView from './VisualizationView';
 

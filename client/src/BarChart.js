@@ -3,12 +3,23 @@ import React, { useEffect, useState, useRef } from 'react';
 
 import './BarChart.css'
 
+function getDayDifference(date1, date2) {
+  let d1 = Math.floor(date1.getTime()/(60000*24*60));
+  let d2 =Math.floor(date2.getTime()/(60000*24*60));
+  return d1-d2;
+}
+
+function normalizeTime(date) {
+  let hour = date.getHours();
+  let minute = date.getMinutes();
+  return (hour*60+minute)/(24*60);
+}
+
 // Parsers/formatters
 function processData(data, height, width) {
   console.log(data);
-  let xStacked = 0;
+  let currentTime = new Date();
   let yStacked = 0;
-  let previousHeightBox = 0;
   let previousDate = new Date(data[0].planned_start_time).getDate();
   
   let processedData = data.map((row, i)=> {
@@ -16,23 +27,21 @@ function processData(data, height, width) {
     let plannedStartTime = new Date(row.planned_start_time);
     let plannedEndTime = new Date(row.planned_end_time);
     let actualStartTime = new Date(row.actual_start_time);
-
+    
     // Check if we have to stack or proceed to next date
-    let heightBox = height*(plannedEndTime.getTime() - plannedStartTime.getTime())/(60000*24*60);
+    let heightBox = height*(normalizeTime(plannedEndTime) - normalizeTime(plannedStartTime));
     if (previousDate === plannedStartTime.getDate()) {
-      yStacked += previousHeightBox;
+      // yStacked += previousHeightBox;
+      yStacked += heightBox;
     } else {
-      xStacked += 1;//plannedStartTime.getDate() - previousDate;
       yStacked = 0;
     }
     previousDate = plannedStartTime.getDate()
 
-    previousHeightBox = heightBox;
-
     return {
       // Graph attributes
-      x: xStacked,
-      y: yStacked,
+      x: 75 - getDayDifference(currentTime, plannedStartTime),
+      y: yStacked - heightBox,
       height: heightBox,
       
       boxID: i,
@@ -45,7 +54,6 @@ function processData(data, height, width) {
       category1: row.category_1,
       category2: row.category_2,
       category3: row.category_3,
-      
     };
   });
   console.log(processedData);

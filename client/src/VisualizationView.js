@@ -1,13 +1,8 @@
 import React, {useState} from 'react';
-import { Grid, Input, Label, Button } from 'semantic-ui-react'
+import { Grid, Input } from 'semantic-ui-react'
 
 import BarChart from './BarChart'
 import './VisualizationView.css'
-
-function getYear() {
-
-}
-
 
 // Functional React Components
 function VisualizationView() {
@@ -51,15 +46,15 @@ function VisualizationView() {
 }
 
 function ItemAdder(props) {
-  function handleSumbit() {
-    let apiParams = {};
-    fetch('/api/insertItem', apiParams)
-      .then((res)=> res.json())
-      .then((res)=> {
-        console.log(res);
-      })
-      .catch((err)=> console.log(err));
-  }
+  // function handleSumbit() {
+  //   let apiParams = {};
+  //   fetch('/api/insertItem', apiParams)
+  //     .then((res)=> res.json())
+  //     .then((res)=> {
+  //       console.log(res);
+  //     })
+  //     .catch((err)=> console.log(err));
+  // }
 
   return(
     <Grid className="ItemAdder">

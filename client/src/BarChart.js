@@ -17,7 +17,7 @@ function normalizeTime(date) {
 
 // Parsers/formatters
 function processData(data, height, width) {
-  console.log(data);
+  // console.log(data);
   let currentTime = new Date();
   let yStacked = 0;
   let previousDate = new Date(data[0].planned_start_time).getDate();
@@ -29,9 +29,8 @@ function processData(data, height, width) {
     let actualStartTime = new Date(row.actual_start_time);
     
     // Check if we have to stack or proceed to next date
-    let heightBox = height*(normalizeTime(plannedEndTime) - normalizeTime(plannedStartTime));
+    let heightBox = height*Math.max(0.01, (normalizeTime(plannedEndTime) - normalizeTime(plannedStartTime)));
     if (previousDate === plannedStartTime.getDate()) {
-      // yStacked += previousHeightBox;
       yStacked += heightBox;
     } else {
       yStacked = 0;
@@ -56,7 +55,6 @@ function processData(data, height, width) {
       category3: row.category_3,
     };
   });
-  console.log(processedData);
 
   return processedData;
 }
@@ -105,6 +103,7 @@ function BarChart(props) {
   useEffect(() => {
     setWidth(ref.current.clientWidth);
     setHeight(ref.current.clientHeight);
+    updateHorizontalGrid(height, width);
   }, [width, height]); 
   
   useEffect(() => {    
@@ -151,7 +150,6 @@ function BarChart(props) {
   function handleClick(e) {
     if (e.target.getAttribute('class') === 'Box clicked') {
       let boxID = e.target.getAttribute("id");
-      // e.target.setAttribute("x", "100");
       props.handleClickBox(data[boxID]);
     }
 
@@ -193,9 +191,28 @@ function updateBarChart(data, zoom) {
   } else if (10 <= zoom) {
     range = Math.max(parseInt(range/zoom*10), 14);
   }
-
+  
   updateBoxes(svg, data, zoom);
-  updateDateIndeces(svg, [...Array(data.length).keys()], zoom);
+  // updateDateIndeces(svg, [...Array(data.length).keys()], zoom);
+  updateDateIndeces(svg, d3.range(data.length), zoom);
+}
+
+function updateHorizontalGrid(height, width) {
+  console.log(height, width);
+  let numGridRow = 24;
+  const svg = d3.select(".Chart");
+  svg.selectAll(".hlines")
+    .remove();
+  
+  svg.selectAll(".hlines")
+    .data(d3.range(numGridRow))
+    .enter()
+    .append("line")
+    .attr("class", "hlines")
+		.attr("x1", 0)
+    .attr("y1", (d, i)=> height*(i+1)/numGridRow)
+    .attr("x2", width)
+    .attr("y2", (d, i)=> height*(i+1)/numGridRow);
 }
 
 function updateBoxes(svg, data, zoom=10) {
@@ -209,7 +226,7 @@ function updateBoxes(svg, data, zoom=10) {
     .attr("id", (d, i)=> d.boxID)
     .attr("class", "Box")
     .attr("x", (d, i) => d.x * xCoeff*1.2*zoom/10)
-    .attr("y", (d, i) => d.y) //h - (d.duration+d.dailyStartTime) *yCoeff*zoom/10)
+    .attr("y", (d, i) => d.y)
     .attr("width", xCoeff*zoom/10)
     .attr("height", (d, i) => d.height)//(d.duration*yCoeff*zoom/10))
     .attr('fill', "green")

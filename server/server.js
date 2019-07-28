@@ -13,19 +13,12 @@ const DB_NAME = 'mottemotte';
 const COLLECTION_NAME = 'dev'; 
 
 // Use connect method to connect to the server
+var db;
 MongoClient.connect(url, function(err, client) {
   assert.equal(null, err);
   console.log("Connected successfully to server");
  
-  const db = client.db(DB_NAME);
-  
-  app.get('/api/getData', (req, res) => {
-    console.log(req.query, 'API GETDATA');
-    findDocuments(db, (docs)=> {
-      res.send(JSON.stringify(docs)); 
-    });
-  });
-
+  db = client.db(DB_NAME);
 });
 
 const findDocuments = function(db, callback) {
@@ -40,9 +33,31 @@ const findDocuments = function(db, callback) {
   });
 }
 
+// HOW TO ENSURE CALL FROM DIFFERENT CLIENT RETURN DIFFERENT CACHED DATA?
+var cachedData = {};
 
+
+function updateCacheData() {
+  return 
+}
 
 app.get('/', (req, res) => res.send('Hello World!'))
+
+app.get('/api/getData', (req, res) => {
+  console.log(req.query, 'API GETDATA');
+  cachedData
+  findDocuments(db, (docs)=> {
+    res.send(JSON.stringify(docs)); 
+  });
+});
+
+app.get('/api/insertJob', (req, res)=> {
+  console.log(req.query, 'API:INSERT JOB')
+  // insertDocuement(db, (doc)=> {
+  
+  res.send(JSON.stringify({'item': 'test'}));
+  // });
+});
 
 
 

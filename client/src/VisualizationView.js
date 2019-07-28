@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
-import { Grid, Input } from 'semantic-ui-react'
+import { Grid, Input, Button } from 'semantic-ui-react'
 
-import BarChart from './BarChart'
+import JobView from './JobView'
 import './VisualizationView.css'
 
 // Functional React Components
@@ -39,7 +39,7 @@ function VisualizationView() {
         category1={category1}
         category2={category2}
         category3={category3}/>
-      <BarChart 
+      <JobView
         handleClickBox={handleClickBox}/>
     </div>
   );
@@ -55,6 +55,16 @@ function ItemAdder(props) {
   //     })
   //     .catch((err)=> console.log(err));
   // }
+  function handleCliekAddItem(e) {
+    console.log(e);
+    let apiParams = {};
+    fetch('/api/insertJob', apiParams)
+      .then((res)=> res.json())
+      .then((res)=> {
+        console.log(res);
+      })
+      .catch((err)=> console.log(err));
+  }
 
   return(
     <Grid className="ItemAdder">
@@ -146,7 +156,10 @@ function ItemAdder(props) {
           </Input>
         </Grid.Column>
         <Grid.Column width={6}>
-          Some other things
+          <Button
+            onClick={handleCliekAddItem}>
+            Add Item
+          </Button>
         </Grid.Column>
       </Grid.Row>
     </Grid>

@@ -1,4 +1,13 @@
 import * as d3 from "d3";
+import {
+  scaleLinear,
+  scaleTime,
+  scaleOrdinal,
+  schemeCategory10,
+} from 'd3-scale';
+
+// import { axis } from 'd3-axis';
+
 import React, { useEffect, useState, useRef } from 'react';
 
 import './BarChart.css'
@@ -63,6 +72,29 @@ let stride = 15;
 
 // Functional Components
 function VerticalScale(props) {
+
+  var margin = {top:0, left:20, bottom:50, right:50 }
+
+  useEffect(() => {
+    var svg = d3.select('.VerticalScale')
+    var yScale = d3.scaleLinear()
+    var yAxisCall = d3.axisLeft()
+                
+    yScale.domain([0,24]).range([0, props.height]);   
+    yAxisCall.scale(yScale).ticks(24) ;   
+    
+    svg.selectAll(".yaxis")
+      .remove();
+
+    svg.append("g")
+      .attr("class", "yaxis")
+      .attr("transform", "translate("+[margin.left, margin.top]+")")
+      .call(yAxisCall)
+    // svg.call(axisScale);
+    console.log('Scale initiated');
+  }); 
+  
+
   return(
     <svg
       className="VerticalScale">
@@ -97,7 +129,6 @@ function BarChart(props) {
   const [zoom, setZoom] = useState(1);
   const [sumDeltaX, setSumDeltaX] = useState(0);
   const [sumDeltaY, setSumDeltaY] = useState(0);
-  const [willChangeDataRange, setWillChangeDataRange] = useState(false);
 
 
   useEffect(() => {
@@ -115,7 +146,7 @@ function BarChart(props) {
       .then((res)=> res.json())
       .then((res)=> setData(processData(res, height, width)))
       .catch((err)=> console.log(err));
-  }, [willChangeDataRange, width, height]);
+  }, [width, height]);
 
   useEffect(()=> {
     updateBarChart(data, zoom);
@@ -157,8 +188,7 @@ function BarChart(props) {
 
   return(
     <div className="BarChart">
-      {/* <div> */}
-        <VerticalScale
+      <VerticalScale
           height={height}/>
         <svg
           ref={ref}

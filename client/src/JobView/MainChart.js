@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import React, { useEffect, useState, useRef } from 'react';
 
+import './MainChart.css';
 
 let range = 14;
 let xCoeff = 100;
@@ -97,6 +98,12 @@ function MainChart(props) {
   const [sumDeltaX, setSumDeltaX] = useState(0);
   const [sumDeltaY, setSumDeltaY] = useState(0);
 
+  useEffect(()=> {
+    console.log(props.data);
+    updateBarChart(props.data, 1);
+    updateHorizontalGrid(props.height, props.width);
+  }, [props.data]);
+
   let stride = 15;
   let indexStart = 0;
   function handleWheel(e) {
@@ -139,6 +146,5 @@ function MainChart(props) {
     </svg>
   )
 }
-
 
 export default MainChart;

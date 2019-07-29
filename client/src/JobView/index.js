@@ -123,35 +123,39 @@ function JobView(props) {
     }
   }
 
-  function handleClick(e) {
-    if (e.target.getAttribute('class') === 'Box clicked') {
-      let boxID = e.target.getAttribute("id");
-      props.handleClickBox(data[boxID]);
-    }
+  function handleClickBox(boxID) {
+    console.log(boxID);
+    props.handleClickBox(boxID);
+    // if (e.target.getAttribute('class') === 'Box clicked') {
+    //   let boxID = e.target.getAttribute("id");
+    //   props.handleClickBox(data[boxID]);
+    // }
   }
 
   return(
-    <div className="BarChart">
+    <div
+      ref={ref}
+      className="BarChart">
       <VerticalScale
-        height={height}/>
+        height={height*0.95}/>
       <MainChart
-        ref={ref}
-        className="MainChart"
+        // className="MainChart2"
         data={data}
+        height={height*0.95}
+        width={width*0.95}
         onWheel={handleWheel}
-        onClick={handleClick}/>
-      <VerticalScale
+        handleClickBox={handleClickBox}/>
+      {/* <VerticalScale
         height={height}/>
       <svg
-        ref={ref}
         className="MainChart"
         onWheel={handleWheel}
         onClick={handleClick}>
-      </svg>
+      </svg> */}
       <Corner />
       <HorizontalScale 
         data={data}
-        width={width}/>
+        width={width*0.95}/>
     </div>
   );
 }

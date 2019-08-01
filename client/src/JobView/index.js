@@ -136,26 +136,25 @@ function JobView(props) {
     <div
       ref={ref}
       className="BarChart">
-      <VerticalScale
-        height={height*0.95}/>
-      <MainChart
-        // className="MainChart2"
-        data={data}
-        height={height*0.95}
-        width={width*0.95}
-        onWheel={handleWheel}
-        handleClickBox={handleClickBox}/>
-      {/* <VerticalScale
-        height={height}/>
-      <svg
-        className="MainChart"
-        onWheel={handleWheel}
-        onClick={handleClick}>
-      </svg> */}
-      <Corner />
-      <HorizontalScale 
-        data={data}
-        width={width*0.95}/>
+      <div
+        className="BarChart row">
+        <VerticalScale
+          height={height*0.95}/>
+        <MainChart
+          // className="MainChart2"
+          data={data}
+          height={height*0.95}
+          width={width*0.95}
+          onWheel={handleWheel}
+          handleClickBox={handleClickBox}/>
+      </div>
+      <div
+        className="BarChart row">
+        <Corner />
+        <HorizontalScale 
+          data={data}
+          width={width*0.95}/>
+      </div>
     </div>
   );
 }

@@ -2,40 +2,73 @@
     width: 100%;
     max-width: 100rem;
     height: 80%;
-    /* overflow : auto; */
+
+    margin: 0;
+    padding: 0;
+    overflow : auto;
+    /* vertical-align: top; */
+}
+
+.BarChart .row {
+    width: 100%;
+    max-width: 100rem;
+    /* height: max-content; */
+
+
+    margin: 0;
+    padding: 0;
+    overflow : auto;
+    display: block;
+    /* vertical-align: top; */
 }
 
 .VerticalScale {
     width: 5%;
     height: 95%;
-    overflow : auto;
+    /* overflow : auto; */
 
+    margin: 0;
+    padding: 0;
     background: #BBBBBB;
+    /* display: block; */
 }
 
 .MainChart {
     width: 95%;
     height: 95%;
-    overflow : auto;
+    /* overflow : auto; */
 
+    margin: 0;
+    padding: 0;
     background: #DDDDDD;
+    /* display: block; */
 }
 
 .Corner {
     width: 5%;
     height: 5%;
-    overflow : auto;
+    /* overflow : auto; */
 
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
     background: #AAAAAA;
+    /* display: block; */
 }
 
 
 .HorizontalScale {
     width: 95%;
     height: 5%;
-    overflow : auto;
+    /* overflow : auto; */
 
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0px;
+    padding-bottom: 0px;
     background: #888888;
+    /* display: block; */
 }
 
 

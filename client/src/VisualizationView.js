@@ -31,14 +31,14 @@ function VisualizationView() {
   
   return(
     <div className="VisualizationView container">
-      <ItemAdder
+      {/* <ItemAdder
         plannedStartTime={plannedStartTime}
         plannedEndTime={plannedEndTime}
         actualStartTime={actualStartTime}
         duation={duration}
         category1={category1}
         category2={category2}
-        category3={category3}/>
+        category3={category3}/> */}
       <JobView
         handleClickBox={handleClickBox}/>
     </div>

@@ -1,10 +1,11 @@
-.MainChart2 {
-    width: 95%;
-    height: 95%;
-    overflow : auto;
-
-    background: #DDDDDD;
+.Box {
+    background: 'green';
 }
+
+.clicked {
+    background: 'magenta';
+}
+
 
 .hlines{
 	stroke:rgb(150,148,109);

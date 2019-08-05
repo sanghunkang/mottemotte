@@ -135,13 +135,12 @@ function JobView(props) {
   return(
     <div
       ref={ref}
-      className="BarChart">
+      className="JobView">
       <div
-        className="BarChart row">
+        className="JobViewRow">
         <VerticalScale
           height={height*0.95}/>
         <MainChart
-          // className="MainChart2"
           data={data}
           height={height*0.95}
           width={width*0.95}
@@ -149,7 +148,7 @@ function JobView(props) {
           handleClickBox={handleClickBox}/>
       </div>
       <div
-        className="BarChart row">
+        className="JobViewRow">
         <Corner />
         <HorizontalScale 
           data={data}

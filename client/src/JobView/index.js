@@ -71,16 +71,29 @@ function JobView(props) {
   
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState([{
+    actualStartTime: props.actualStartTime,
+    boxID: props.boxID,
+    category1: props.category1,
+    category2: props.category2,
+    category3: props.category3,
+    duration: 30,
+    height: 10,
+    plannedEndTime: props.plannedEndTime,
+    plannedStartTime: props.plannedStartTime,
+    x: 60,
+    y: 20,
+  }]);
   const [zoom, setZoom] = useState(1);
   const [sumDeltaX, setSumDeltaX] = useState(0);
   const [sumDeltaY, setSumDeltaY] = useState(0);
 
 
   useEffect(() => {
+    console.log(props);
     setWidth(ref.current.clientWidth);
     setHeight(ref.current.clientHeight);
-    updateHorizontalGrid(height, width);
+    // updateHorizontalGrid(height, width);
   }, [width, height]); 
   
   useEffect(() => {    
@@ -90,13 +103,13 @@ function JobView(props) {
     };
     fetch('/api/getData', apiParams)
       .then((res)=> res.json())
-      .then((res)=> setData(processData(res, height, width)))
+      .then((res)=> setData([...processData(res, height, width), ...data]))
       .catch((err)=> console.log(err));
   }, [width, height]);
 
-  useEffect(()=> {
-    updateBarChart(data, zoom);
-  }, [data, zoom]);
+  // useEffect(()=> {
+  //   updateBarChart(data, zoom);
+  // }, [data, zoom]);
 
   let indexStart = 0;
   function handleWheel(e) {
@@ -137,7 +150,7 @@ function JobView(props) {
       ref={ref}
       className="JobView">
       <div
-        className="JobViewRow">
+        className="JobViewRowUpper">
         <VerticalScale
           height={height*0.95}/>
         <MainChart
@@ -148,7 +161,7 @@ function JobView(props) {
           handleClickBox={handleClickBox}/>
       </div>
       <div
-        className="JobViewRow">
+        className="JobViewRowLower">
         <Corner />
         <HorizontalScale 
           data={data}
@@ -161,94 +174,94 @@ function JobView(props) {
 
 
 
-let range = 14;
-let xCoeff = 100;
+// let range = 14;
+// let xCoeff = 100;
 
-// d3 functions
-function updateBarChart(data, zoom) {
-  const svg = d3.select(".MainChart");
-  if (zoom < 10) {
-    range = Math.min(parseInt(range/zoom*10), 50);
-  } else if (10 <= zoom) {
-    range = Math.max(parseInt(range/zoom*10), 14);
-  }
+// // d3 functions
+// function updateBarChart(data, zoom) {
+//   const svg = d3.select(".MainChart");
+//   if (zoom < 10) {
+//     range = Math.min(parseInt(range/zoom*10), 50);
+//   } else if (10 <= zoom) {
+//     range = Math.max(parseInt(range/zoom*10), 14);
+//   }
   
-  updateBoxes(svg, data, zoom);
-  // updateDateIndeces(svg, [...Array(data.length).keys()], zoom);
-}
+//   updateBoxes(svg, data, zoom);
+//   // updateDateIndeces(svg, [...Array(data.length).keys()], zoom);
+// }
 
-function updateHorizontalGrid(height, width) {
-  console.log(height, width);
-  let numGridRow = 24;
-  const svg = d3.select(".MainChart");
-  svg.selectAll(".hlines")
-    .remove();
+// function updateHorizontalGrid(height, width) {
+//   console.log(height, width);
+//   let numGridRow = 24;
+//   const svg = d3.select(".MainChart");
+//   svg.selectAll(".hlines")
+//     .remove();
   
-  svg.selectAll(".hlines")
-    .data(d3.range(numGridRow))
-    .enter()
-    .append("line")
-    .attr("class", "hlines")
-		.attr("x1", 0)
-    .attr("y1", (d, i)=> height*(i+1)/numGridRow)
-    .attr("x2", width)
-    .attr("y2", (d, i)=> height*(i+1)/numGridRow);
-}
+//   svg.selectAll(".hlines")
+//     .data(d3.range(numGridRow))
+//     .enter()
+//     .append("line")
+//     .attr("class", "hlines")
+// 		.attr("x1", 0)
+//     .attr("y1", (d, i)=> height*(i+1)/numGridRow)
+//     .attr("x2", width)
+//     .attr("y2", (d, i)=> height*(i+1)/numGridRow);
+// }
 
-function updateBoxes(svg, data, zoom=10) {
-  svg.selectAll(".Box")
-    .remove();
+// function updateBoxes(svg, data, zoom=10) {
+//   svg.selectAll(".Box")
+//     .remove();
 
-  svg.selectAll(".Box")
-    .data(data)
-    .enter()
-    .append("rect")
-    .attr("id", (d, i)=> d.boxID)
-    .attr("class", "Box")
-    .attr("x", (d, i) => d.x * xCoeff*1.2*zoom/10)
-    .attr("y", (d, i) => d.y)
-    .attr("width", xCoeff*zoom/10)
-    .attr("height", (d, i) => d.height)//(d.duration*yCoeff*zoom/10))
-    .attr('fill', "green")
-    .on('click', onClickItem)
-    .on('mouseenter', onMouseEnterItem)
-    .on('mouseleave', onMouseLeaveItem);
-};
+//   svg.selectAll(".Box")
+//     .data(data)
+//     .enter()
+//     .append("rect")
+//     .attr("id", (d, i)=> d.boxID)
+//     .attr("class", "Box")
+//     .attr("x", (d, i) => d.x * xCoeff*1.2*zoom/10)
+//     .attr("y", (d, i) => d.y)
+//     .attr("width", xCoeff*zoom/10)
+//     .attr("height", (d, i) => d.height)//(d.duration*yCoeff*zoom/10))
+//     .attr('fill', "green")
+//     .on('click', onClickItem)
+//     .on('mouseenter', onMouseEnterItem)
+//     .on('mouseleave', onMouseLeaveItem);
+// };
 
-const HIGHLIGHT_ON = 'yellow';
-const HIGHLIGHT_OFF = 'green';
+// const HIGHLIGHT_ON = 'yellow';
+// const HIGHLIGHT_OFF = 'green';
 
 
-// Event Handlers
-var onClickItem = function() {
-  return function() {
-    d3.select('.clicked')
-      .classed('clicked', false)
-      .attr('fill', HIGHLIGHT_OFF);
+// // Event Handlers
+// var onClickItem = function() {
+//   return function() {
+//     d3.select('.clicked')
+//       .classed('clicked', false)
+//       .attr('fill', HIGHLIGHT_OFF);
     
-    d3.select(this)
-      .classed('clicked', true)
-      .attr('fill', 'magenta');
-  }
-}();
+//     d3.select(this)
+//       .classed('clicked', true)
+//       .attr('fill', 'magenta');
+//   }
+// }();
 
-var onMouseEnterItem = function() {
-  return function() {
-    if (this.classList.contains('clicked') === false) {
-      d3.select(this)
-        .attr('fill', HIGHLIGHT_ON)
-    }
-  }
-}();
+// var onMouseEnterItem = function() {
+//   return function() {
+//     if (this.classList.contains('clicked') === false) {
+//       d3.select(this)
+//         .attr('fill', HIGHLIGHT_ON)
+//     }
+//   }
+// }();
 
-var onMouseLeaveItem = function(){
-  return function() {
-    if (this.classList.contains('clicked') === false) {
-      d3.select(this)
-        .attr('fill', HIGHLIGHT_OFF)
-    }
-  }
-}();
+// var onMouseLeaveItem = function(){
+//   return function() {
+//     if (this.classList.contains('clicked') === false) {
+//       d3.select(this)
+//         .attr('fill', HIGHLIGHT_OFF)
+//     }
+//   }
+// }();
 
 
 
